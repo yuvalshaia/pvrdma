@@ -317,8 +317,7 @@ static int pvrdma_set_page(struct ib_mr *ibmr, u64 addr)
 	return 0;
 }
 
-int pvrdma_map_mr_sg(struct ib_mr *ibmr, struct scatterlist *sg, int sg_nents,
-		     unsigned int *sg_offset)
+int pvrdma_map_mr_sg(struct ib_mr *ibmr, struct scatterlist *sg, int sg_nents)
 {
 	struct pvrdma_user_mr *mr = to_vmr(ibmr);
 	struct pvrdma_dev *dev = to_vdev(ibmr->device);
@@ -326,7 +325,7 @@ int pvrdma_map_mr_sg(struct ib_mr *ibmr, struct scatterlist *sg, int sg_nents,
 
 	mr->npages = 0;
 
-	ret = ib_sg_to_pages(ibmr, sg, sg_nents, sg_offset, pvrdma_set_page);
+	ret = ib_sg_to_pages(ibmr, sg, sg_nents, pvrdma_set_page);
 	if (ret < 0)
 		dev_warn(&dev->pdev->dev, "could not map sg to pages\n");
 

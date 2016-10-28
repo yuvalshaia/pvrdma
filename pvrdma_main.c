@@ -239,7 +239,7 @@ static int pvrdma_register_device(struct pvrdma_dev *dev)
 	dev->ib_dev.get_netdev = pvrdma_get_netdev;
 	dev->ib_dev.get_port_immutable = pvrdma_port_immutable;
 	dev->ib_dev.get_link_layer = pvrdma_port_link_layer;
-	dev->ib_dev.get_dev_fw_str = pvrdma_get_fw_ver_str;
+	//dev->ib_dev.get_dev_fw_str = pvrdma_get_fw_ver_str;
 
 	mutex_init(&dev->port_mutex);
 	spin_lock_init(&dev->desc_lock);
