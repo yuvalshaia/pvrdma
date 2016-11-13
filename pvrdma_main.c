@@ -810,6 +810,7 @@ static int pvrdma_netdevice_event(struct notifier_block *this,
 static int pvrdma_pci_probe(struct pci_dev *pdev,
 			    const struct pci_device_id *id)
 {
+	struct pci_dev *pdev_net;
 	struct pvrdma_dev *dev;
 	int ret;
 	unsigned long start;
@@ -1005,6 +1006,32 @@ static int pvrdma_pci_probe(struct pci_dev *pdev,
 		ret = -EINVAL;
 		goto err_free_cq_ring;
 	}
+
+	/* Paired vmxnet3 will have same bus, slot. But func will be 0 */
+	pdev_net = pci_get_slot(pdev->bus, PCI_DEVFN(PCI_SLOT(pdev->devfn), 0));
+	if (!pdev_net) {
+		dev_err(&pdev->dev, "failed to find paired net device\n");
+		ret = -ENODEV;
+		goto err_free_cq_ring;
+	}
+
+	if (pdev_net->vendor != PCI_VENDOR_ID_VMWARE ||
+	    pdev_net->device != PCI_DEVICE_ID_VMWARE_VMXNET3) {
+		dev_err(&pdev->dev, "failed to find paired vmxnet3 device\n");
+		pci_dev_put(pdev_net);
+		ret = -ENODEV;
+		goto err_free_cq_ring;
+	}
+
+	dev->netdev = pci_get_drvdata(pdev_net);
+	pci_dev_put(pdev_net);
+	if (!dev->netdev) {
+		dev_err(&pdev->dev, "failed to get vmxnet3 device\n");
+		ret = -ENODEV;
+		goto err_free_cq_ring;
+	}
+
+	dev_info(&pdev->dev, "paired device to %s\n", dev->netdev->name);
 
 	/* Interrupt setup */
 	ret = pvrdma_alloc_intrs(dev);

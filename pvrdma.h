@@ -60,6 +60,8 @@
 #include "pvrdma_dev_api.h"
 #include "pvrdma_verbs.h"
 
+#define PCI_DEVICE_ID_VMWARE_VMXNET3	0x07b0
+
 /* NOT the same as BIT_MASK(). */
 #define PVRDMA_MASK(n) ((n << 1) - 1)
 

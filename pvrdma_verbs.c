@@ -175,10 +175,13 @@ int pvrdma_query_gid(struct ib_device *ibdev, u8 port, int index,
 {
 	struct pvrdma_dev *dev = to_vdev(ibdev);
 
+printk(KERN_CRIT "---->1 pvrdma_query_gid\n");
 	if (index >= dev->dsr->caps.gid_tbl_len)
 		return -EINVAL;
 
 	memcpy(gid, &dev->sgid_tbl[index], sizeof(union ib_gid));
+
+printk(KERN_CRIT "---->2 pvrdma_query_gid\n");
 
 	return 0;
 }
